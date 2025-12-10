@@ -20,6 +20,9 @@ import {
   Clock,
   BookOpen
 } from "lucide-react";
+import MarketReportSection from "@/components/MarketReportSection";
+import CompetitiveAnalysisSection from "@/components/CompetitiveAnalysisSection";
+import EntryPointSection from "@/components/EntryPointSection";
 import { motion } from "framer-motion";
 
 export default function Home() {
@@ -314,6 +317,11 @@ export default function Home() {
           </section>
 
         </div>
+        
+        {/* New Sections from User Request */}
+        <MarketReportSection />
+        <CompetitiveAnalysisSection />
+        <EntryPointSection />
 
         {/* Calculator Modal */}
         <Dialog open={calculatorOpen} onOpenChange={setCalculatorOpen}>
