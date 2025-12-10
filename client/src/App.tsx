@@ -6,6 +6,13 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
 import BiddingStrategy from "./pages/BiddingStrategy";
+import LeadAutomation from "./pages/LeadAutomation";
+import FollowUpAutomation from "./pages/FollowUpAutomation";
+import HyperLocalSEO from "./pages/HyperLocalSEO";
+import GMPOptimization from "./pages/GMPOptimization";
+import ReviewGeneration from "./pages/ReviewGeneration";
+import ReviewRecency from "./pages/ReviewRecency";
+import DMVMarketIntelligence from "./pages/DMVMarketIntelligence";
 
 
 function Router() {
@@ -13,6 +20,13 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/bidding"} component={BiddingStrategy} />
+      <Route path={"/lead-automation"} component={LeadAutomation} />
+      <Route path={"/follow-up"} component={FollowUpAutomation} />
+      <Route path={"/hyper-local-seo"} component={HyperLocalSEO} />
+      <Route path={"/gmp-optimization"} component={GMPOptimization} />
+      <Route path={"/review-generation"} component={ReviewGeneration} />
+      <Route path={"/review-recency"} component={ReviewRecency} />
+      <Route path={"/market-intelligence"} component={DMVMarketIntelligence} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
