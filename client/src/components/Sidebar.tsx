@@ -47,7 +47,7 @@ export default function Sidebar() {
             M
           </div>
           <div className="leading-tight">
-            <h1 className="text-white font-bold text-sm tracking-wider">HVAC.STRAT</h1>
+            <h1 className="text-white font-bold text-sm tracking-wider">HVAC</h1>
             <div className="text-[#ff4400] font-bold text-xs tracking-wide mt-0.5">DMV MARKET GUIDE</div>
             <div className="text-[#ff4400] text-[10px] mt-0.5">v1.0</div>
           </div>

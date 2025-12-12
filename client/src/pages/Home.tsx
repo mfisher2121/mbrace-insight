@@ -128,7 +128,7 @@ export default function Home() {
             <div className="lg:col-span-2 space-y-6">
               <div className="space-y-2">
                 <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
-                  The Operating System for <span className="text-primary">HVAC Growth</span>
+                  MBRACE INSIGHT <span className="text-primary">The DMV Market Intelligence Terminal</span>
                 </h1>
                 <p className="text-slate-400 text-lg max-w-2xl font-light">
                   Turn your ad spend, reviews, and field ops into a predictable EBITDA machine. Built on DMV market intelligence.
