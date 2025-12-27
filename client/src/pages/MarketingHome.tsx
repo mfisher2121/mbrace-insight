@@ -345,6 +345,11 @@ export default function MarketingHome() {
                   </a>
                 </li>
                 <li>
+                  <a href="https://mbraceintelligence.com" target="_blank" rel="noopener noreferrer" className="hover:text-[#22c55e] transition-colors">
+                    Intelligence Dashboard →
+                  </a>
+                </li>
+                <li>
                   <Link href="/systems" className="hover:text-[#22c55e] transition-colors">
                     5-System Playbook →
                   </Link>

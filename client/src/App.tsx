@@ -17,17 +17,20 @@ import GMPOptimization from "./pages/GMPOptimization";
 import ReviewGeneration from "./pages/ReviewGeneration";
 import ReviewRecency from "./pages/ReviewRecency";
 import DMVMarketIntelligence from "./pages/DMVMarketIntelligence";
-import LSADataAnalytics from "./pages/LSADataAnalytics";
-import RAGSystem from "./pages/RAGSystem";
-import VAPIAgent from "./pages/VAPIAgent";
-import LeadSources from "./pages/LeadSources";
-import FileStorage from "./pages/FileStorage";
 
 
 function Router() {
+  // Detect which domain we're on
+  const isIntelligenceDomain = typeof window !== 'undefined' && 
+    (window.location.hostname === 'mbraceintelligence.com' || 
+     window.location.hostname.includes('mbraceintelligence'));
+  
+  // Default homepage based on domain
+  const HomePage = isIntelligenceDomain ? Home : MarketingHome;
+
   return (
     <Switch>
-      <Route path={"/"} component={MarketingHome} />
+      <Route path={"/"} component={HomePage} />
       <Route path={"/for-contractors"} component={ForContractors} />
       <Route path={"/for-platforms"} component={ForPlatforms} />
       <Route path={"/systems"} component={Systems} />
@@ -40,11 +43,6 @@ function Router() {
       <Route path={"/review-generation"} component={ReviewGeneration} />
       <Route path={"/review-recency"} component={ReviewRecency} />
       <Route path={"/market-intelligence"} component={DMVMarketIntelligence} />
-      <Route path={"/lsa"} component={LSADataAnalytics} />
-      <Route path={"/rag"} component={RAGSystem} />
-      <Route path={"/vapi"} component={VAPIAgent} />
-      <Route path={"/sources"} component={LeadSources} />
-      <Route path={"/files"} component={FileStorage} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
