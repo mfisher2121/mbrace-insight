@@ -1,0 +1,143 @@
+{
+  "name": "MBRACE Market Intel Report - Form Capture",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "market-intel-report",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Receive Form Submission",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "market-intel-report"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract form data from request body\nconst body = $input.item.json.body || $input.item.json;\nconst formData = body.data || body;\n\n// Normalize and extract all form fields\nconst submission = {\n  // Company info\n  company_name: formData.company || formData['company'] || '',\n  website: formData.website || formData['website'] || '',\n  zip_code: formData.zip || formData['zip'] || '',\n  email: formData.email || formData['email'] || '',\n  \n  // Form type\n  form_type: 'market_intel_report',\n  \n  // Metadata\n  submission_id: formData.submission_id || `mintel-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,\n  submitted_at: formData.submitted_at || new Date().toISOString(),\n  page_url: formData.page_url || '',\n  referrer: formData.referrer || '',\n  user_agent: formData.user_agent || ''\n};\n\nreturn {\n  json: submission\n};"
+      },
+      "id": "process-data",
+      "name": "Process Form Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "tableId": {
+          "__rl": true,
+          "value": "mbrace_market_intel_submissions",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "company_name": "={{ $json.company_name }}",
+            "website": "={{ $json.website }}",
+            "zip_code": "={{ $json.zip_code }}",
+            "email": "={{ $json.email }}",
+            "form_type": "={{ $json.form_type }}",
+            "submission_id": "={{ $json.submission_id }}",
+            "submitted_at": "={{ $json.submitted_at }}",
+            "page_url": "={{ $json.page_url }}",
+            "referrer": "={{ $json.referrer }}",
+            "user_agent": "={{ $json.user_agent }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "store-data",
+      "name": "Store in Data Table",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "mfisher@mbraceinsight.com",
+        "toEmail": "mfisher@mbraceinsight.com",
+        "subject": "New Market Intel Report Request - {{ $json.company_name }}",
+        "emailType": "html",
+        "message": "<h2>New Market Intel Report Request</h2>\n<p><strong>Company:</strong> {{ $json.company_name }}</p>\n<p><strong>Website:</strong> {{ $json.website }}</p>\n<p><strong>ZIP Code:</strong> {{ $json.zip_code }}</p>\n<p><strong>Email:</strong> {{ $json.email }}</p>\n<p><strong>Submitted:</strong> {{ $json.submitted_at }}</p>\n<p><strong>Page:</strong> {{ $json.page_url }}</p>",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Send Notification Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Market Intel Report request received. We'll send your report within 24 hours.\" } }}",
+        "options": {}
+      },
+      "id": "success-response",
+      "name": "Send Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Receive Form Submission": {
+      "main": [
+        [
+          {
+            "node": "Process Form Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Form Data": {
+      "main": [
+        [
+          {
+            "node": "Store in Data Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Data Table": {
+      "main": [
+        [
+          {
+            "node": "Send Notification Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Notification Email": {
+      "main": [
+        [
+          {
+            "node": "Send Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

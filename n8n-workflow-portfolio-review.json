@@ -1,0 +1,142 @@
+{
+  "name": "MBRACE Portfolio Review - Form Capture",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "portfolio-review",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Receive Form Submission",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [250, 300],
+      "webhookId": "portfolio-review"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract form data from request body\nconst body = $input.item.json.body || $input.item.json;\nconst formData = body.data || body;\n\n// Normalize and extract all form fields\nconst submission = {\n  // Platform info\n  platform_name: formData.platform || formData['platform'] || '',\n  number_of_locations: formData.locations || formData['locations'] || '',\n  email: formData.email || formData['pe-email'] || formData['email'] || '',\n  \n  // Form type\n  form_type: 'portfolio_review',\n  \n  // Metadata\n  submission_id: formData.submission_id || `portfolio-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,\n  submitted_at: formData.submitted_at || new Date().toISOString(),\n  page_url: formData.page_url || '',\n  referrer: formData.referrer || '',\n  user_agent: formData.user_agent || ''\n};\n\nreturn {\n  json: submission\n};"
+      },
+      "id": "process-data",
+      "name": "Process Form Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "tableId": {
+          "__rl": true,
+          "value": "mbrace_portfolio_review_submissions",
+          "mode": "list"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "platform_name": "={{ $json.platform_name }}",
+            "number_of_locations": "={{ $json.number_of_locations }}",
+            "email": "={{ $json.email }}",
+            "form_type": "={{ $json.form_type }}",
+            "submission_id": "={{ $json.submission_id }}",
+            "submitted_at": "={{ $json.submitted_at }}",
+            "page_url": "={{ $json.page_url }}",
+            "referrer": "={{ $json.referrer }}",
+            "user_agent": "={{ $json.user_agent }}"
+          }
+        },
+        "options": {}
+      },
+      "id": "store-data",
+      "name": "Store in Data Table",
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "mfisher@mbraceinsight.com",
+        "toEmail": "mfisher@mbraceinsight.com",
+        "subject": "New Portfolio Review Request - {{ $json.platform_name }}",
+        "emailType": "html",
+        "message": "<h2>New Portfolio Review Request (PE Platform)</h2>\n<p><strong>Platform/Firm:</strong> {{ $json.platform_name }}</p>\n<p><strong>Number of Locations:</strong> {{ $json.number_of_locations }}</p>\n<p><strong>Email:</strong> {{ $json.email }}</p>\n<p><strong>Submitted:</strong> {{ $json.submitted_at }}</p>\n<p><strong>Page:</strong> {{ $json.page_url }}</p>",
+        "options": {}
+      },
+      "id": "send-email",
+      "name": "Send Notification Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [850, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Portfolio Review request received. Expect a response within 24 hours.\" } }}",
+        "options": {}
+      },
+      "id": "success-response",
+      "name": "Send Success Response",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1050, 300]
+    }
+  ],
+  "connections": {
+    "Receive Form Submission": {
+      "main": [
+        [
+          {
+            "node": "Process Form Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Form Data": {
+      "main": [
+        [
+          {
+            "node": "Store in Data Table",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Store in Data Table": {
+      "main": [
+        [
+          {
+            "node": "Send Notification Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send Notification Email": {
+      "main": [
+        [
+          {
+            "node": "Send Success Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2025-01-01T00:00:00.000Z",
+  "versionId": "1"
+}
+

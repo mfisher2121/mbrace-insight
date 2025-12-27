@@ -1,9 +1,103 @@
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { FileText, Box, Scan } from "lucide-react";
+import { FileText, Box, Scan, CheckCircle2, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function EntryPointSection() {
+  const [marketIntelLoading, setMarketIntelLoading] = useState(false);
+  const [portfolioLoading, setPortfolioLoading] = useState(false);
+  const [marketIntelSuccess, setMarketIntelSuccess] = useState(false);
+  const [portfolioSuccess, setPortfolioSuccess] = useState(false);
+
+  const handleMarketIntelSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setMarketIntelLoading(true);
+    setMarketIntelSuccess(false);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    
+    const submission = {
+      company: formData.get("company") as string,
+      website: formData.get("website") as string,
+      zip: formData.get("zip") as string,
+      email: formData.get("email") as string,
+      submission_id: `mintel-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      submitted_at: new Date().toISOString(),
+      page_url: window.location.href,
+      referrer: document.referrer || "",
+      user_agent: navigator.userAgent || ""
+    };
+
+    try {
+      const response = await fetch("https://n8n.mbrace.it.com/webhook/market-intel-report", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ data: submission }),
+      });
+
+      if (response.ok) {
+        setMarketIntelSuccess(true);
+        form.reset();
+        toast.success("Market Intel Report request received! We'll send your report within 24 hours.");
+      } else {
+        throw new Error("Submission failed");
+      }
+    } catch (error) {
+      console.error("Error submitting Market Intel Report:", error);
+      toast.error("Something went wrong. Please try again or contact us directly.");
+    } finally {
+      setMarketIntelLoading(false);
+    }
+  };
+
+  const handlePortfolioReviewSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setPortfolioLoading(true);
+    setPortfolioSuccess(false);
+
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    
+    const submission = {
+      platform: formData.get("platform") as string,
+      locations: formData.get("locations") as string,
+      email: formData.get("pe-email") as string,
+      submission_id: `portfolio-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      submitted_at: new Date().toISOString(),
+      page_url: window.location.href,
+      referrer: document.referrer || "",
+      user_agent: navigator.userAgent || ""
+    };
+
+    try {
+      const response = await fetch("https://n8n.mbrace.it.com/webhook/portfolio-review", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ data: submission }),
+      });
+
+      if (response.ok) {
+        setPortfolioSuccess(true);
+        form.reset();
+        toast.success("Portfolio Review request received! Expect a response within 24 hours.");
+      } else {
+        throw new Error("Submission failed");
+      }
+    } catch (error) {
+      console.error("Error submitting Portfolio Review:", error);
+      toast.error("Something went wrong. Please try again or contact us directly.");
+    } finally {
+      setPortfolioLoading(false);
+    }
+  };
+
   return (
     <section className="py-24 bg-[#0f1115] text-white border-t border-slate-800">
       <div className="container max-w-6xl mx-auto">
@@ -34,32 +128,48 @@ export default function EntryPointSection() {
                 </p>
               </div>
 
-              <form className="space-y-4 mt-auto">
+              <form onSubmit={handleMarketIntelSubmit} className="space-y-4 mt-auto">
                 <div className="space-y-1.5">
                   <Label htmlFor="company" className="text-xs font-mono text-slate-500 uppercase">Company Name</Label>
-                  <Input id="company" placeholder="Acme HVAC" className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 focus:border-green-500 focus:ring-green-500/20" />
+                  <Input id="company" name="company" placeholder="Acme HVAC" required className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 focus:border-green-500 focus:ring-green-500/20" />
                 </div>
                 
                 <div className="space-y-1.5">
                   <Label htmlFor="website" className="text-xs font-mono text-slate-500 uppercase">Website</Label>
-                  <Input id="website" placeholder="https://acmehvac.com" className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 focus:border-green-500 focus:ring-green-500/20" />
+                  <Input id="website" name="website" type="url" placeholder="https://acmehvac.com" required className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 focus:border-green-500 focus:ring-green-500/20" />
                 </div>
                 
                 <div className="space-y-1.5">
                   <Label htmlFor="zip" className="text-xs font-mono text-slate-500 uppercase">Primary ZIP Code</Label>
-                  <Input id="zip" placeholder="20814" className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 focus:border-green-500 focus:ring-green-500/20" />
+                  <Input id="zip" name="zip" placeholder="20814" maxLength={5} required className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 focus:border-green-500 focus:ring-green-500/20" />
                 </div>
                 
                 <div className="space-y-1.5">
                   <Label htmlFor="email" className="text-xs font-mono text-slate-500 uppercase">Work Email</Label>
                   <div className="relative">
-                    <Input id="email" placeholder="john@acmehvac.com" className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 pr-10 focus:border-green-500 focus:ring-green-500/20" />
+                    <Input id="email" name="email" type="email" placeholder="john@acmehvac.com" required className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 pr-10 focus:border-green-500 focus:ring-green-500/20" />
                     <Scan className="absolute right-3 top-2.5 h-5 w-5 text-slate-600" />
                   </div>
                 </div>
 
-                <Button className="w-full bg-green-500 hover:bg-green-600 text-black font-bold font-mono h-11 mt-2">
-                  Generate My Report
+                <Button 
+                  type="submit" 
+                  disabled={marketIntelLoading || marketIntelSuccess}
+                  className="w-full bg-green-500 hover:bg-green-600 text-black font-bold font-mono h-11 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {marketIntelLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : marketIntelSuccess ? (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Request Received!
+                    </>
+                  ) : (
+                    "Generate My Report"
+                  )}
                 </Button>
                 
                 <p className="text-[10px] text-slate-600 text-center font-mono pt-2">
@@ -86,27 +196,43 @@ export default function EntryPointSection() {
                 </p>
               </div>
 
-              <form className="space-y-4 mt-auto">
+              <form onSubmit={handlePortfolioReviewSubmit} className="space-y-4 mt-auto">
                 <div className="space-y-1.5">
                   <Label htmlFor="platform" className="text-xs font-mono text-slate-500 uppercase">Platform / Firm Name</Label>
-                  <Input id="platform" placeholder="Horizon HVAC Holdings" className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 focus:border-[#ff4400] focus:ring-[#ff4400]/20" />
+                  <Input id="platform" name="platform" placeholder="Horizon HVAC Holdings" required className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 focus:border-[#ff4400] focus:ring-[#ff4400]/20" />
                 </div>
                 
                 <div className="space-y-1.5">
                   <Label htmlFor="locations" className="text-xs font-mono text-slate-500 uppercase">Number of Locations</Label>
-                  <Input id="locations" placeholder="12" className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 focus:border-[#ff4400] focus:ring-[#ff4400]/20" />
+                  <Input id="locations" name="locations" type="number" min="1" placeholder="12" required className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 focus:border-[#ff4400] focus:ring-[#ff4400]/20" />
                 </div>
                 
                 <div className="space-y-1.5">
                   <Label htmlFor="pe-email" className="text-xs font-mono text-slate-500 uppercase">Work Email</Label>
                   <div className="relative">
-                    <Input id="pe-email" placeholder="ops@horizonhvac.com" className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 pr-10 focus:border-[#ff4400] focus:ring-[#ff4400]/20" />
+                    <Input id="pe-email" name="pe-email" type="email" placeholder="ops@horizonhvac.com" required className="bg-[#0f1115] border-slate-700 text-white font-mono h-10 pr-10 focus:border-[#ff4400] focus:ring-[#ff4400]/20" />
                     <Scan className="absolute right-3 top-2.5 h-5 w-5 text-slate-600" />
                   </div>
                 </div>
 
-                <Button className="w-full bg-[#ff4400] hover:bg-[#ff4400]/90 text-white font-bold font-mono h-11 mt-2">
-                  Request Portfolio Review
+                <Button 
+                  type="submit" 
+                  disabled={portfolioLoading || portfolioSuccess}
+                  className="w-full bg-[#ff4400] hover:bg-[#ff4400]/90 text-white font-bold font-mono h-11 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {portfolioLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : portfolioSuccess ? (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Request Received!
+                    </>
+                  ) : (
+                    "Request Portfolio Review"
+                  )}
                 </Button>
                 
                 <p className="text-[10px] text-slate-600 text-center font-mono pt-2">
