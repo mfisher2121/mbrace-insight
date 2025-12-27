@@ -23,7 +23,7 @@ export default function Sidebar() {
 
   const navItems = [
     { name: "DASHBOARD", icon: LayoutDashboard, href: "/" },
-    { name: "MARKET INTEL REPORT", icon: FileText, href: "/report" },
+    { name: "MARKET INTEL REPORT", icon: FileText, href: "/market-intelligence" },
     { name: "LSA DATA & ANALYTICS", icon: BarChart3, href: "/lsa" },
     { name: "BIDDING STRATEGY", icon: TrendingUp, href: "/bidding" },
     { name: "RAG SYSTEM", icon: Database, href: "/rag" },

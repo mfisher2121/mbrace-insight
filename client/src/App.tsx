@@ -17,6 +17,11 @@ import GMPOptimization from "./pages/GMPOptimization";
 import ReviewGeneration from "./pages/ReviewGeneration";
 import ReviewRecency from "./pages/ReviewRecency";
 import DMVMarketIntelligence from "./pages/DMVMarketIntelligence";
+import LSADataAnalytics from "./pages/LSADataAnalytics";
+import RAGSystem from "./pages/RAGSystem";
+import VAPIAgent from "./pages/VAPIAgent";
+import LeadSources from "./pages/LeadSources";
+import FileStorage from "./pages/FileStorage";
 
 
 function Router() {
@@ -43,6 +48,12 @@ function Router() {
       <Route path={"/review-generation"} component={ReviewGeneration} />
       <Route path={"/review-recency"} component={ReviewRecency} />
       <Route path={"/market-intelligence"} component={DMVMarketIntelligence} />
+      <Route path={"/report"} component={DMVMarketIntelligence} />
+      <Route path={"/lsa"} component={LSADataAnalytics} />
+      <Route path={"/rag"} component={RAGSystem} />
+      <Route path={"/vapi"} component={VAPIAgent} />
+      <Route path={"/sources"} component={LeadSources} />
+      <Route path={"/files"} component={FileStorage} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
