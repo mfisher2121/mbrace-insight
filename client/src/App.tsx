@@ -5,6 +5,10 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Home from "./pages/Home";
+import MarketingHome from "./pages/MarketingHome";
+import ForContractors from "./pages/ForContractors";
+import ForPlatforms from "./pages/ForPlatforms";
+import Systems from "./pages/Systems";
 import BiddingStrategy from "./pages/BiddingStrategy";
 import LeadAutomation from "./pages/LeadAutomation";
 import FollowUpAutomation from "./pages/FollowUpAutomation";
@@ -23,7 +27,11 @@ import FileStorage from "./pages/FileStorage";
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={MarketingHome} />
+      <Route path={"/for-contractors"} component={ForContractors} />
+      <Route path={"/for-platforms"} component={ForPlatforms} />
+      <Route path={"/systems"} component={Systems} />
+      <Route path={"/dashboard"} component={Home} />
       <Route path={"/bidding"} component={BiddingStrategy} />
       <Route path={"/lead-automation"} component={LeadAutomation} />
       <Route path={"/follow-up"} component={FollowUpAutomation} />
